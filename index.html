@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Rating Form</title>
+    <style>
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            font-size: 2rem;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .rating input:checked ~ label,
+        .rating label:hover,
+        .rating label:hover ~ label {
+            color: #f5b301;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .thankyou-message {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: green;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <form id="ratingForm">
+        <h2>Student Feedback Form</h2>
+
+        <!-- Student Information -->
+        <label for="studentName">Name:</label>
+        <input type="text" id="studentName" name="studentName" required>
+
+        <label for="studentClass">Class:</label>
+        <input type="text" id="studentClass" name="studentClass" required>
+
+        <label for="studentRoll">Roll Number:</label>
+        <input type="text" id="studentRoll" name="studentRoll" required>
+
+        <!-- Star Rating -->
+        <label for="rating">Rate the course:</label>
+        <div class="rating">
+            <input type="radio" name="rating" id="star5" value="5" required>
+            <label for="star5" title="5 stars">★</label>
+            <input type="radio" name="rating" id="star4" value="4">
+            <label for="star4" title="4 stars">★</label>
+            <input type="radio" name="rating" id="star3" value="3">
+            <label for="star3" title="3 stars">★</label>
+            <input type="radio" name="rating" id="star2" value="2">
+            <label for="star2" title="2 stars">★</label>
+            <input type="radio" name="rating" id="star1" value="1">
+            <label for="star1" title="1 star">★</label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit">Submit</button>
+    </form>
+
+    <!-- Thank You Message -->
+    <div class="thankyou-message" id="thankYouMsg">
+        Thank you for your feedback!
+    </div>
+
+    <!-- View Feedback Button -->
+    <button id="viewFeedbackBtn" style="display: none;">View Submitted Feedback</button>
+    <div id="feedbackList"></div>
+</div>
+
+<!-- JavaScript to handle form submission and local storage -->
+<script>
+    document.getElementById('ratingForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent the form from actually submitting
+
+        // Get form data
+        const name = document.getElementById('studentName').value;
+        const studentClass = document.getElementById('studentClass').value;
+        const roll = document.getElementById('studentRoll').value;
+        const rating = document.querySelector('input[name="rating"]:checked').value;
+
+        // Create an object for the feedback
+        const feedback = {
+            name: name,
+            studentClass: studentClass,
+            roll: roll,
+            rating: rating
+        };
+
+        // Retrieve existing feedback from local storage or initialize empty array
+        let feedbackList = JSON.parse(localStorage.getItem('feedbackList')) || [];
+
+        // Add new feedback to the list
+        feedbackList.push(feedback);
+
+        // Store the updated list in local storage
+        localStorage.setItem('feedbackList', JSON.stringify(feedbackList));
+
+        // Display thank you message and hide the form
+        document.getElementById('thankYouMsg').style.display = 'block';
+        document.getElementById('ratingForm').style.display = 'none';
+
+        // Show the "View Submitted Feedback" button
+        document.getElementById('viewFeedbackBtn').style.display = 'block';
+    });
+
+    // Display the stored feedback when "View Submitted Feedback" is clicked
+    document.getElementById('viewFeedbackBtn').addEventListener('click', function() {
+        const feedbackList = JSON.parse(localStorage.getItem('feedbackList')) || [];
+        const feedbackDisplay = document.getElementById('feedbackList');
+        feedbackDisplay.innerHTML = ''; // Clear previous feedback list
+
+        if (feedbackList.length > 0) {
+            feedbackList.forEach((feedback, index) => {
+                feedbackDisplay.innerHTML += `
+                    <p><strong>Feedback ${index + 1}:</strong></p>
+                    <p>Name: ${feedback.name}</p>
+                    <p>Class: ${feedback.studentClass}</p>
+                    <p>Roll Number: ${feedback.roll}</p>
+                    <p>Rating: ${feedback.rating} stars</p>
+                    <hr>
+                `;
+            });
+        } else {
+            feedbackDisplay.innerHTML = '<p>No feedback submitted yet.</p>';
+        }
+    });
+</script>
+
+</body>
+</html>
